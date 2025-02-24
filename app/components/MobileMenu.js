@@ -13,8 +13,6 @@ export default function MobileMenu({ open, onClose, navLinks, searchQuery, onSea
     setExpandedMenu(expandedMenu === index ? null : index);
   };
 
-  console.log('navLinks:', navLinks); // Debugging
-
   return (
     <Drawer
       anchor="right"
@@ -30,6 +28,7 @@ export default function MobileMenu({ open, onClose, navLinks, searchQuery, onSea
       }}
     >
       <Box sx={{ p: 2 }}>
+        {/* Header with Close Button */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography variant="h6">Menu</Typography>
           <IconButton onClick={onClose} sx={{ color: 'white' }}>
@@ -57,52 +56,76 @@ export default function MobileMenu({ open, onClose, navLinks, searchQuery, onSea
           />
         </Box>
 
+        {/* Navigation Links */}
         <List component="nav">
           {navLinks.map((link, index) => (
             <div key={link.path}>
-              <ListItem 
-                button 
-                onClick={() => link.subLinks ? handleSubmenuToggle(index) : onClose()}
-                sx={{
-                  py: 1.5,
-                  '&:hover': { bgcolor: 'rgba(255,255,255,0.05)' }
-                }}
-              >
-                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                  {link.icon}
-                  <Typography sx={{ ml: 1.5, flexGrow: 1 }}>{link.name}</Typography>
-                  {link.subLinks && (
-                    expandedMenu === index ? <ExpandLess /> : <ExpandMore />
-                  )}
-                </Box>
-              </ListItem>
+              {/* Render dropdown or regular link */}
+              {link.subLinks ? (
+                <>
+                  {/* Dropdown Parent Item */}
+                  <ListItem 
+                    button 
+                    onClick={() => handleSubmenuToggle(index)}
+                    sx={{
+                      py: 1.5,
+                      '&:hover': { bgcolor: 'rgba(255,255,255,0.05)' }
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                      {link.icon}
+                      <Typography sx={{ ml: 1.5, flexGrow: 1 }}>{link.name}</Typography>
+                      {expandedMenu === index ? <ExpandLess /> : <ExpandMore />}
+                    </Box>
+                  </ListItem>
 
-              {link.subLinks && (
-                <Collapse in={expandedMenu === index}>
-                  <List component="div" disablePadding>
-                    {link.subLinks.map((subLink) => (
-                      <ListItem 
-                        key={subLink.path}
-                        component={Link}
-                        href={subLink.path}
-                        onClick={onClose}
-                        sx={{
-                          pl: 4,
-                          py: 1.5,
-                          color: 'rgba(255,255,255,0.8)',
-                          '&:hover': {
-                            bgcolor: 'rgba(255,215,0,0.1)',
-                            color: '#ffd700'
-                          }
-                        }}
-                      >
-                        {subLink.name}
-                      </ListItem>
-                    ))}
-                  </List>
-                </Collapse>
+                  {/* Dropdown Submenu Items */}
+                  <Collapse in={expandedMenu === index}>
+                    <List component="div" disablePadding>
+                      {link.subLinks.map((subLink) => (
+                        <ListItem 
+                          key={subLink.path}
+                          component={Link}
+                          href={subLink.path}
+                          onClick={onClose}
+                          sx={{
+                            pl: 4,
+                            py: 1.5,
+                            color: 'rgba(255,255,255,0.8)',
+                            '&:hover': {
+                              bgcolor: 'rgba(255,215,0,0.1)',
+                              color: '#ffd700'
+                            }
+                          }}
+                        >
+                          {subLink.name}
+                        </ListItem>
+                      ))}
+                    </List>
+                  </Collapse>
+                </>
+              ) : (
+                // Regular Link Item
+                <ListItem 
+                  button 
+                  component={Link}
+                  href={link.path}
+                  onClick={onClose}
+                  sx={{
+                    py: 1.5,
+                    '&:hover': { bgcolor: 'rgba(255,255,255,0.05)' },
+                    textDecoration: 'none',
+                    color: 'inherit'
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                    {link.icon}
+                    <Typography sx={{ ml: 1.5, flexGrow: 1 }}>{link.name}</Typography>
+                  </Box>
+                </ListItem>
               )}
 
+              {/* Divider between items */}
               <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)', my: 1 }} />
             </div>
           ))}

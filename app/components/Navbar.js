@@ -124,23 +124,11 @@ export default function Navbar() {
           py: 2,
           px: { xs: 2, md: 4 }
         }}>
-          <Link href="/" passHref legacyBehavior>
-            <Typography 
-              component="a"
-              variant="h6" 
-              sx={{ 
-                fontWeight: 700,
-                color: "white",
-                textDecoration: 'none',
-                '&:hover': { opacity: 0.8 },
-                transition: 'opacity 0.2s',
-                mr: 4
-              }}
-              aria-label="Home page"
-            >
-              Fashion Store
-            </Typography>
-          </Link>
+<img
+  src="storino.png"
+  alt="Fashion Store Logo"
+  style={{  width: '90px' }} // Adjust size here
+/>
 
           <Box sx={{ 
             flexGrow: 1,
