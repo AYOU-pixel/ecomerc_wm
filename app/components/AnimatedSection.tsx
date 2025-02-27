@@ -69,9 +69,8 @@ export default function AnimatedSection() {
         zIndex: 1,
       }}
     >
-      <Link href="/shop" legacyBehavior passHref>
+      <Link href="/shop" passHref>
         <GoldButton
-          component="a"
           aria-label="Explore our luxury collection"
           sx={{
             animation: `${fadeIn} 1s ease-out 0.6s forwards`,
