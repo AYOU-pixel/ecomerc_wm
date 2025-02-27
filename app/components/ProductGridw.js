@@ -1,4 +1,3 @@
-// components/ProductGrid.js
 "use client";
 import { useState, useCallback } from 'react';
 import Image from 'next/image';
@@ -20,8 +19,8 @@ const productsData = [
     { id: 8, name: 'Water Bottle', price: 14.99, image: '/w8.webp', rating: 4.3, discount: 0 },
     { id: 9, name: 'New Balance 530 White', price: 39.99, image: '/w9.jpg', rating: 4.6, discount: 20 },
     { id: 10, name: 'Cushioned Ankle Socks', price: 39.99, image: '/w10.webp', rating: 4.6, discount: 20 },
-    { id: 11, name: 'Stainless Steel Chug Bottle', price: 39.99, image: '/w11.avif', rating: 4.6, discount: 20 },
-    { id: 12, name: 'Training Duffel Bag ', price: 39.99, image: '/w12.jpeg', rating: 4.6, discount: 20 },
+    { id: 11, name: 'Stainless', price: 39.99, image: '/w11.avif', rating: 4.6, discount: 20 },
+    { id: 12, name: 'Training Bag', price: 39.99, image: '/w12.jpeg', rating: 4.6, discount: 20 },
 ].map(product => ({
     ...product,
     discountedPrice: (product.price * (1 - product.discount / 100)).toFixed(2),
@@ -79,9 +78,10 @@ const ProductGrid = () => {
         );
     }, [addedToCart]);
 
-    // Handle View Details Navigation
-    const handleViewDetails = (productId) => {
-        router.push(`/products/${productId}`);
+    // Handle View Details Navigation with Product Name
+    const handleViewDetails = (productName) => {
+        console.log("Navigating to product:", productName); // Debug log
+        router.push(`/products/${encodeURIComponent(productName)}`);
     };
 
     // Handle Go Home Navigation
@@ -140,7 +140,7 @@ const ProductGrid = () => {
                                 fill
                                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                 className="object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
-                                onClick={() => handleViewDetails(product.id)}
+                                onClick={() => handleViewDetails(product.name)} // Updated to use name
                             />
                         </div>
 
@@ -180,7 +180,7 @@ const ProductGrid = () => {
                                     {addedToCart[product.id] ? 'Added 💖' : 'Add to Cart'}
                                 </button>
                                 <button
-                                    onClick={() => handleViewDetails(product.id)}
+                                    onClick={() => handleViewDetails(product.name)} // Updated to use name
                                     className="flex-1 py-3 bg-white hover:bg-pink-50 rounded-xl transition-colors duration-300 
                                                font-semibold text-lg text-pink-600 border border-pink-200 hover:border-pink-300"
                                 >

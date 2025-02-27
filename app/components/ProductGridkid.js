@@ -1,4 +1,3 @@
-// components/ProductGrid.js
 "use client";
 import { useState, useCallback } from 'react';
 import Image from 'next/image';
@@ -85,8 +84,10 @@ const ProductGrid = () => {
         );
     }, [addedToCart]);
 
-    const handleViewDetails = (productId) => {
-        router.push(`/products/${productId}`);
+    // Updated to pass product name instead of ID
+    const handleViewDetails = (productName) => {
+        console.log("Navigating to product:", productName); // Debug log
+        router.push(`/products/${encodeURIComponent(productName)}`);
     };
 
     const handleGoHome = () => {
@@ -123,23 +124,22 @@ const ProductGrid = () => {
                         className="relative group bg-white rounded-3xl overflow-hidden shadow-xl
                                    hover:shadow-2xl border-4 border-pink-300"
                     >
-                   {/* Discount Badge */}
-{product.discount > 0 && (
-    <motion.div
-        className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 
-                   rounded-full text-sm font-semibold z-10 shadow-md"
-        animate={{ scale: [1, 1.1, 1] }}
-        transition={{ repeat: Infinity, duration: 2 }}
-    >
-        {EMOJIS.discount} {product.discount}% OFF!
-    </motion.div>
-)}
-
+                        {/* Discount Badge */}
+                        {product.discount > 0 && (
+                            <motion.div
+                                className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 
+                                           rounded-full text-sm font-semibold z-10 shadow-md"
+                                animate={{ scale: [1, 1.1, 1] }}
+                                transition={{ repeat: Infinity, duration: 2 }}
+                            >
+                                {EMOJIS.discount} {product.discount}% OFF!
+                            </motion.div>
+                        )}
 
                         {/* Product Image */}
                         <div 
                             className="relative h-64 cursor-pointer"
-                            onClick={() => handleViewDetails(product.id)}
+                            onClick={() => handleViewDetails(product.name)} // Updated to use name
                         >
                             <Image
                                 src={product.image}
@@ -186,7 +186,7 @@ const ProductGrid = () => {
                                     </motion.button>
                                     
                                     <motion.button
-                                        onClick={() => handleViewDetails(product.id)}
+                                        onClick={() => handleViewDetails(product.name)} // Updated to use name
                                         whileHover={{ scale: 1.05 }}
                                         className="flex-1 py-4 bg-purple-400 text-white rounded-2xl 
                                                    text-xl font-bold hover:bg-purple-500"

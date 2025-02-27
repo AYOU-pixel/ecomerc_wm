@@ -3,10 +3,11 @@
 import { useState, useCallback } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { FaStar, FaStarHalfAlt, FaHome } from 'react-icons/fa';
+import { FaStar, FaStarHalfAlt, FaHome } from 'react-icons/fa'; // Import specific icons
 import { motion } from 'framer-motion';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import React from 'react'; // Import React for memo
 
 // Precompute discounted prices
 const productsData = [
@@ -21,13 +22,13 @@ const productsData = [
     { id: 9, name: 'New Balance 530 White', price: 39.99, image: '/num.jpg', rating: 4.6, discount: 20 },
     { id: 10, name: 'Cushioned Ankle Socks', price: 39.99, image: '/sm.jpeg', rating: 4.6, discount: 20 },
     { id: 11, name: 'Stainless Steel Chug Bottle', price: 39.99, image: '/kra.png', rating: 4.6, discount: 20 },
-    { id: 12, name: 'Training Duffel Bag ', price: 39.99, image: '/bagi.jpeg', rating: 4.6, discount: 20 },
+    { id: 12, name: 'Training Duffel Bag', price: 39.99, image: '/bagi.jpeg', rating: 4.6, discount: 20 },
 ].map(product => ({
     ...product,
     discountedPrice: (product.price * (1 - product.discount / 100)).toFixed(2),
 }));
 
-// StarRating Component
+// StarRating Component without animations
 const StarRating = ({ rating }) => {
     const fullStars = Math.floor(rating);
     const decimal = rating % 1;
@@ -36,23 +37,97 @@ const StarRating = ({ rating }) => {
     return (
         <div className="flex items-center gap-1">
             {[...Array(5)].map((_, i) => (
-                <motion.span 
-                    key={i}
-                    whileHover={{ scale: 1.1 }}
-                    className="transition-transform duration-200"
-                >
+                <span key={i}>
                     {i < fullStars ? (
-                        <FaStar className="w-4 h-4 text-yellow-400 hover:text-yellow-300" />
+                        <FaStar className="w-4 h-4 text-yellow-400" />
                     ) : hasHalfStar && i === fullStars ? (
                         <FaStarHalfAlt className="w-4 h-4 text-yellow-400" />
                     ) : (
                         <FaStar className="w-4 h-4 text-gray-500/70" />
                     )}
-                </motion.span>
+                </span>
             ))}
         </div>
     );
 };
+
+// Memoized ProductCard Component
+const ProductCard = React.memo(({ product, handleAddToCart, handleViewDetails, addedToCart }) => (
+    <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="relative group bg-gray-900/80 backdrop-blur-sm border border-yellow-600/60 rounded-lg overflow-hidden transition-transform duration-300 hover:scale-[1.03] hover:shadow-[0_0_15px_#facc15]"
+    >
+        {/* Discount Badge */}
+        {product.discount > 0 && (
+            <motion.span 
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="absolute top-4 right-4 bg-yellow-500/90 text-black px-3 py-1 rounded-full text-sm font-bold z-10 shadow-md shadow-yellow-400/20"
+            >
+                -{product.discount}%
+            </motion.span>
+        )}
+
+        {/* Product Image */}
+        <div className="relative h-72 cursor-pointer overflow-hidden">
+            <Image
+                src={product.image}
+                alt={product.name}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-cover group-hover:scale-105 transition-transform duration-300 hover:opacity-90"
+                onClick={() => handleViewDetails(product)} // Pass the full product object
+                loading="lazy" // Lazy load images
+            />
+        </div>
+
+        {/* Product Details */}
+        <div className="p-5 space-y-4">
+            <h3 className="text-xl font-bold text-yellow-300 truncate tracking-wide">
+                {product.name}
+            </h3>
+
+            <div className="flex items-center justify-between">
+                <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                        <span className="text-2xl font-bold text-yellow-300 tracking-wide">
+                            ${product.discountedPrice}
+                        </span>
+                        {product.discount > 0 && (
+                            <span className="text-gray-500/80 line-through text-sm">
+                                ${product.price.toFixed(2)}
+                            </span>
+                        )}
+                    </div>
+                    <StarRating rating={product.rating} />
+                </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3">
+                <button
+                    onClick={() => handleAddToCart(product)}
+                    className={`flex-1 py-3 rounded-lg font-semibold text-lg transition-all duration-200 
+                        ${
+                            addedToCart[product.id] 
+                                ? 'bg-yellow-600 hover:bg-yellow-700 text-black hover:shadow-[0_0_10px_#facc15]'
+                                : 'bg-yellow-500 hover:bg-yellow-600 text-black hover:shadow-[0_0_10px_#facc15]'
+                        }`}
+                >
+                    {addedToCart[product.id] ? 'Added ✅' : 'Add to Cart'}
+                </button>
+                <button
+                    onClick={() => handleViewDetails(product)} // Pass the full product object
+                    className="flex-1 py-3 bg-gray-800/80 hover:bg-gray-700/80 rounded-lg transition-colors duration-200 font-semibold text-lg text-yellow-300 border border-yellow-600/60 hover:border-yellow-500"
+                >
+                    Details
+                </button>
+            </div>
+        </div>
+    </motion.div>
+));
 
 // Main ProductGrid Component
 const ProductGrid = () => {
@@ -78,8 +153,8 @@ const ProductGrid = () => {
     }, [addedToCart]);
 
     // Handle View Details Navigation
-    const handleViewDetails = (productId) => {
-        router.push(`/products/${productId}`);
+    const handleViewDetails = (product) => {
+        router.push(`/products/${encodeURIComponent(product.name)}`); // Use encodeURIComponent for safe URLs
     };
 
     // Handle Go Home Navigation
@@ -109,81 +184,14 @@ const ProductGrid = () => {
 
             {/* Product Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 pt-16">
-                {productsData.map((product, index) => (
-                    <motion.div
+                {productsData.map((product) => (
+                    <ProductCard
                         key={product.id}
-                        initial={{ opacity: 0, y: 50 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, delay: index * 0.05 }}
-                        className="relative group bg-gray-900/80 backdrop-blur-sm border border-yellow-600/60 rounded-lg overflow-hidden transition-transform duration-300 hover:scale-[1.03] hover:shadow-[0_0_15px_#facc15]"
-                    >
-                        {/* Discount Badge */}
-                        {product.discount > 0 && (
-                            <motion.span 
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                className="absolute top-4 right-4 bg-yellow-500/90 text-black px-3 py-1 rounded-full text-sm font-bold z-10 shadow-md shadow-yellow-400/20"
-                            >
-                                -{product.discount}%
-                            </motion.span>
-                        )}
-
-                        {/* Product Image */}
-                        <div className="relative h-72 cursor-pointer overflow-hidden">
-                            <Image
-                                src={product.image}
-                                alt={product.name}
-                                fill
-                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                className="object-cover group-hover:scale-105 transition-transform duration-300 hover:opacity-90"
-                                onClick={() => handleViewDetails(product.id)}
-                            />
-                        </div>
-
-                        {/* Product Details */}
-                        <div className="p-5 space-y-4">
-                            <h3 className="text-xl font-bold text-yellow-300 truncate tracking-wide">
-                                {product.name}
-                            </h3>
-
-                            <div className="flex items-center justify-between">
-                                <div className="space-y-2">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-2xl font-bold text-yellow-300 tracking-wide">
-                                            ${product.discountedPrice}
-                                        </span>
-                                        {product.discount > 0 && (
-                                            <span className="text-gray-500/80 line-through text-sm">
-                                                ${product.price.toFixed(2)}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <StarRating rating={product.rating} />
-                                </div>
-                            </div>
-
-                            {/* Action Buttons */}
-                            <div className="flex gap-3">
-                                <button
-                                    onClick={() => handleAddToCart(product)}
-                                    className={`flex-1 py-3 rounded-lg font-semibold text-lg transition-all duration-200 
-                                        ${
-                                            addedToCart[product.id] 
-                                                ? 'bg-yellow-600 hover:bg-yellow-700 text-black hover:shadow-[0_0_10px_#facc15]'
-                                                : 'bg-yellow-500 hover:bg-yellow-600 text-black hover:shadow-[0_0_10px_#facc15]'
-                                        }`}
-                                >
-                                    {addedToCart[product.id] ? 'Added ✅' : 'Add to Cart'}
-                                </button>
-                                <button
-                                    onClick={() => handleViewDetails(product.id)}
-                                    className="flex-1 py-3 bg-gray-800/80 hover:bg-gray-700/80 rounded-lg transition-colors duration-200 font-semibold text-lg text-yellow-300 border border-yellow-600/60 hover:border-yellow-500"
-                                >
-                                    Details
-                                </button>
-                            </div>
-                        </div>
-                    </motion.div>
+                        product={product}
+                        handleAddToCart={handleAddToCart}
+                        handleViewDetails={handleViewDetails}
+                        addedToCart={addedToCart}
+                    />
                 ))}
             </div>
 

@@ -22,7 +22,6 @@ import SocialIcons from './SocialIcons';
 // Navigation items with unique IDs
 const navItems = [
   { id: 1, name: 'Shop', path: '/shop' },
-  { id: 2, name: 'Collections', path: '/collections' },
   { id: 3, name: 'About', path: '/about' },
   { id: 4, name: 'Contact', path: '/contact' },
 ];

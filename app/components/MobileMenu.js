@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
 import { Drawer, List, ListItem, Divider, Collapse, Box, Typography, IconButton, InputBase } from '@mui/material';
@@ -9,9 +9,15 @@ import { Search, Close, ExpandMore, ExpandLess } from '@mui/icons-material';
 export default function MobileMenu({ open, onClose, navLinks, searchQuery, onSearchChange }) {
   const [expandedMenu, setExpandedMenu] = useState(null);
 
-  const handleSubmenuToggle = (index) => {
-    setExpandedMenu(expandedMenu === index ? null : index);
-  };
+  // Memoized callback to toggle submenu
+  const handleSubmenuToggle = useCallback((index) => {
+    setExpandedMenu((prev) => (prev === index ? null : index));
+  }, []);
+
+  // Memoized callback for search input
+  const handleSearchChange = useCallback((e) => {
+    onSearchChange(e.target.value);
+  }, [onSearchChange]);
 
   return (
     <Drawer
@@ -20,39 +26,41 @@ export default function MobileMenu({ open, onClose, navLinks, searchQuery, onSea
       onClose={onClose}
       PaperProps={{
         sx: {
-          width: '100%',
-          maxWidth: '400px',
+          width: { xs: '85vw', sm: '400px' }, // Responsive width
           bgcolor: '#1a1a1a',
           color: 'white',
-        }
+        },
       }}
     >
       <Box sx={{ p: 2 }}>
         {/* Header with Close Button */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography variant="h6">Menu</Typography>
-          <IconButton onClick={onClose} sx={{ color: 'white' }}>
+          <IconButton onClick={onClose} sx={{ color: 'white' }} aria-label="Close menu">
             <Close />
           </IconButton>
         </Box>
 
         {/* Mobile Search Bar */}
-        <Box sx={{
-          display: 'flex',
-          alignItems: 'center',
-          bgcolor: 'rgba(255,255,255,0.1)',
-          borderRadius: 1,
-          px: 2,
-          py: 1,
-          mb: 3
-        }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            bgcolor: 'rgba(255,255,255,0.1)',
+            borderRadius: 1,
+            px: 2,
+            py: 1,
+            mb: 3,
+          }}
+        >
           <Search sx={{ mr: 1 }} />
           <InputBase
             placeholder="Search..."
             value={searchQuery}
-            onChange={onSearchChange}
+            onChange={handleSearchChange}
             fullWidth
             sx={{ color: 'white' }}
+            inputProps={{ 'aria-label': 'Search products' }}
           />
         </Box>
 
@@ -60,16 +68,14 @@ export default function MobileMenu({ open, onClose, navLinks, searchQuery, onSea
         <List component="nav">
           {navLinks.map((link, index) => (
             <div key={link.path}>
-              {/* Render dropdown or regular link */}
               {link.subLinks ? (
                 <>
-                  {/* Dropdown Parent Item */}
-                  <ListItem 
-                    button 
+                  <ListItem
+                    button
                     onClick={() => handleSubmenuToggle(index)}
                     sx={{
                       py: 1.5,
-                      '&:hover': { bgcolor: 'rgba(255,255,255,0.05)' }
+                      '&:hover': { bgcolor: 'rgba(255,255,255,0.05)' },
                     }}
                   >
                     <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
@@ -79,11 +85,10 @@ export default function MobileMenu({ open, onClose, navLinks, searchQuery, onSea
                     </Box>
                   </ListItem>
 
-                  {/* Dropdown Submenu Items */}
                   <Collapse in={expandedMenu === index}>
                     <List component="div" disablePadding>
                       {link.subLinks.map((subLink) => (
-                        <ListItem 
+                        <ListItem
                           key={subLink.path}
                           component={Link}
                           href={subLink.path}
@@ -94,8 +99,9 @@ export default function MobileMenu({ open, onClose, navLinks, searchQuery, onSea
                             color: 'rgba(255,255,255,0.8)',
                             '&:hover': {
                               bgcolor: 'rgba(255,215,0,0.1)',
-                              color: '#ffd700'
-                            }
+                              color: '#ffd700',
+                            },
+                            textDecoration: 'none',
                           }}
                         >
                           {subLink.name}
@@ -105,9 +111,8 @@ export default function MobileMenu({ open, onClose, navLinks, searchQuery, onSea
                   </Collapse>
                 </>
               ) : (
-                // Regular Link Item
-                <ListItem 
-                  button 
+                <ListItem
+                  button
                   component={Link}
                   href={link.path}
                   onClick={onClose}
@@ -115,7 +120,7 @@ export default function MobileMenu({ open, onClose, navLinks, searchQuery, onSea
                     py: 1.5,
                     '&:hover': { bgcolor: 'rgba(255,255,255,0.05)' },
                     textDecoration: 'none',
-                    color: 'inherit'
+                    color: 'inherit',
                   }}
                 >
                   <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
@@ -124,8 +129,6 @@ export default function MobileMenu({ open, onClose, navLinks, searchQuery, onSea
                   </Box>
                 </ListItem>
               )}
-
-              {/* Divider between items */}
               <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)', my: 1 }} />
             </div>
           ))}
@@ -138,6 +141,8 @@ export default function MobileMenu({ open, onClose, navLinks, searchQuery, onSea
 // Default props
 MobileMenu.defaultProps = {
   navLinks: [],
+  searchQuery: '',
+  onSearchChange: () => {},
 };
 
 // Prop validation
