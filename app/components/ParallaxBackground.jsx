@@ -6,8 +6,8 @@ import { Box } from "@mui/material";
 import { throttle } from "lodash";
 
 export default function ParallaxBackground() {
-  const scrollRef = useRef<number>(0); // Explicitly type scrollRef as a number
-  const bgRef = useRef<HTMLDivElement | null>(null); // Explicitly type bgRef as an HTMLDivElement
+  const scrollRef = useRef(0); // No type annotation
+  const bgRef = useRef(null); // No type annotation
 
   // Throttle the scroll event handler to improve performance
   const handleScroll = throttle(() => {

@@ -1,3 +1,4 @@
+import ProductCards from "../components/ProductCards"
 export default function ProductDetails() {
   // Deduplicated products and fixed ID conflicts
   const products = [
