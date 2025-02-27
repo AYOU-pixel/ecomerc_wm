@@ -1,6 +1,15 @@
 import ProductCards from "../components/ProductCards";
 
-const products = [
+type Product = {
+  id: number;
+  name: string;
+  price: number;
+  images: string[];
+  slug: string;
+  sizes: string[];
+};
+
+const products: Product[] = [
   {
     id: 1,
     name: "Air Jordan 1 Retro High OG",
@@ -72,4 +81,3 @@ export default function ProductDetails() {
     </div>
   );
 }
-
