@@ -6,9 +6,10 @@ import { Box } from "@mui/material";
 import { throttle } from "lodash";
 
 export default function ParallaxBackground() {
-  const scrollRef = useRef(0);
-  const bgRef = useRef(null);
+  const scrollRef = useRef<number>(0); // Explicitly type scrollRef as a number
+  const bgRef = useRef<HTMLDivElement | null>(null); // Explicitly type bgRef as an HTMLDivElement
 
+  // Throttle the scroll event handler to improve performance
   const handleScroll = throttle(() => {
     if (typeof window !== "undefined" && bgRef.current) {
       scrollRef.current = window.pageYOffset;
@@ -16,6 +17,7 @@ export default function ParallaxBackground() {
     }
   }, 100);
 
+  // Add and clean up the scroll event listener
   useEffect(() => {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
