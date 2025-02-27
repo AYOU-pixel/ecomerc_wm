@@ -1,4 +1,5 @@
 "use client";
+import Image from 'next/image';
 import { useState, useCallback, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -124,10 +125,12 @@ export default function Navbar() {
           py: 2,
           px: { xs: 2, md: 4 }
         }}>
-<img
-  src="storino.png"
+<Image
+  src="/storino.png" 
   alt="Fashion Store Logo"
-  style={{  width: '90px' }} // Adjust size here
+  width={90} 
+  height={40} 
+  style={{ width: '90px', height: 'auto' }} 
 />
 
           <Box sx={{ 

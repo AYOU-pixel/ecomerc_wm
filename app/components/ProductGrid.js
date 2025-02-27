@@ -129,6 +129,9 @@ const ProductCard = React.memo(({ product, handleAddToCart, handleViewDetails, a
     </motion.div>
 ));
 
+// Add displayName to the ProductCard component
+ProductCard.displayName = 'ProductCard';
+
 // Main ProductGrid Component
 const ProductGrid = () => {
     const router = useRouter();
