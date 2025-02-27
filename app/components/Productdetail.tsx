@@ -1,4 +1,5 @@
-import ProductCards from "../components/ProductCards";
+import React from 'react'; // Ensure React is imported
+import ProductCards from './ProductCards'; // Adjust the import path as needed
 
 type Product = {
   id: number;
@@ -80,7 +81,7 @@ export default function ProductDetails() {
       <ProductCards products={products} />
       <h2>The dynamic pages</h2>
       <ul>
-        {products.map((post: Product) => (
+        {products.map((post) => (
           <li key={post.id}>{post.name}</li>
         ))}
       </ul>
