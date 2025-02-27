@@ -55,7 +55,7 @@ const products: Product[] = [
     sizes: ["30", "34", "37", "38", "40", "42", "43"],
   },
   {
-    id: 4, // Fixed duplicate ID
+    id: 4,
     name: "Nike Dunk Low Retro SE - Premium",
     price: 170,
     images: [
@@ -78,6 +78,12 @@ export default function ProductDetails() {
   return (
     <div>
       <ProductCards products={products} />
+      <h2>The dynamic pages</h2>
+      <ul>
+        {products.map((post: Product) => (
+          <li key={post.id}>{post.name}</li>
+        ))}
+      </ul>
     </div>
   );
 }
