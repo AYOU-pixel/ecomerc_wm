@@ -1,3 +1,4 @@
+// navbar.js
 "use client";
 import Image from 'next/image';
 import { useState, useCallback, useMemo, useEffect } from "react";
@@ -16,6 +17,7 @@ import {
   ClickAwayListener,
 } from "@mui/material";
 import { Search, Info, Description, Email, ShoppingBag, Menu as MenuIcon, ExpandMore } from "@mui/icons-material";
+import { alpha } from '@mui/material/styles';
 
 const NAV_LINKS = [
   { 
@@ -39,9 +41,15 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isClient, setIsClient] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const handleMenuOpen = useCallback((event, index) => {
@@ -63,7 +71,11 @@ export default function Navbar() {
         backgroundColor: '#2a2a2a',
         color: 'white',
         minWidth: '200px',
-        boxShadow: '0 8px 24px rgba(0,0,0,0.3)'
+        borderRadius: 2,
+        boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+        '& .MuiMenuItem-root': {
+          transition: 'all 0.2s',
+        }
       }
     },
     MenuListProps: { 
@@ -114,7 +126,8 @@ export default function Navbar() {
         component="nav"
         sx={{ 
           backgroundColor: "#1a1a1a",
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+          boxShadow: scrolled ? '0 4px 12px rgba(0,0,0,0.2)' : 'none',
+          transition: 'all 0.3s ease',
         }}
       >
         <Toolbar sx={{ 
@@ -122,16 +135,20 @@ export default function Navbar() {
           justifyContent: "space-between",
           mx: 'auto',
           width: '100%',
-          py: 2,
-          px: { xs: 2, md: 4 }
+          py: { xs: 1, md: 2 },
+          px: { xs: 1.5, md: 4 },
+          minHeight: { xs: 56, md: 64 }
         }}>
-<Image
-  src="/storino.png" 
-  alt="Fashion Store Logo"
-  width={90} 
-  height={40} 
-  style={{ width: '90px', height: 'auto' }} 
-/>
+          <Image
+            src="/storino.png" 
+            alt="Fashion Store Logo"
+            width={90} 
+            height={40} 
+            style={{ 
+              width: 'clamp(70px, 15vw, 90px)', 
+              height: 'auto' 
+            }} 
+          />
 
           <Box sx={{ 
             flexGrow: 1,
@@ -149,9 +166,12 @@ export default function Navbar() {
               px: 2,
               py: 0.8,
               width: '100%',
-              transition: 'background-color 0.3s',
+              transition: 'all 0.3s',
               '&:hover': {
                 backgroundColor: 'rgba(255,255,255,0.25)'
+              },
+              '&:focus-within': {
+                borderColor: alpha('#ffd700', 0.5),
               }
             }}>
               <Search sx={{ color: "white", mr: 1, fontSize: '1.3rem' }} />
@@ -174,7 +194,7 @@ export default function Navbar() {
 
           <Box sx={{ 
             display: { xs: "none", md: "flex" }, 
-            gap: 4,
+            gap: 3,
             alignItems: 'center'
           }}>
             {NAV_LINKS.map((link, index) => (
@@ -191,9 +211,10 @@ export default function Navbar() {
                         cursor: 'pointer',
                         color: 'white',
                         '&:hover': { color: '#ffd700' },
-                        transition: 'color 0.3s',
+                        transition: 'all 0.3s',
                         py: 1,
-                        px: 1.5
+                        px: 1.5,
+                        borderRadius: 1,
                       }}
                       onClick={(e) => handleMenuOpen(e, index)}
                     >
@@ -220,6 +241,7 @@ export default function Navbar() {
                         transition: 'color 0.2s',
                         py: 1,
                         px: 1.5,
+                        borderRadius: 1,
                         borderBottom: pathname === link.path ? '2px solid #ffd700' : 'none'
                       }}
                       aria-label={link.name}
@@ -252,7 +274,6 @@ export default function Navbar() {
               navLinks={NAV_LINKS}
               searchQuery={searchQuery}
               onSearchChange={handleSearch}
-              currentPath={pathname}
             />
           </Box>
         </Toolbar>

@@ -1,15 +1,15 @@
 // components/ProductGrid.js
 "use client";
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react'; // تمت إضافة useCallback هنا
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { FaStar, FaStarHalfAlt, FaHome } from 'react-icons/fa'; // Import specific icons
+import { FaStar, FaStarHalfAlt, FaHome } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import React from 'react'; // Import React for memo
+import React from 'react';
 
-// Precompute discounted prices
+// بيانات المنتجات الثابتة
 const productsData = [
     { id: 1, name: 'Performance T-Shirt', price: 29.99, image: '/chirt.webp', rating: 4.5, discount: 0 },
     { id: 2, name: 'Training Shorts', price: 39.99, image: '/short.webp', rating: 4.0, discount: 20 },
@@ -28,7 +28,7 @@ const productsData = [
     discountedPrice: (product.price * (1 - product.discount / 100)).toFixed(2),
 }));
 
-// StarRating Component without animations
+// StarRating Component
 const StarRating = ({ rating }) => {
     const fullStars = Math.floor(rating);
     const decimal = rating % 1;
@@ -78,8 +78,8 @@ const ProductCard = React.memo(({ product, handleAddToCart, handleViewDetails, a
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover group-hover:scale-105 transition-transform duration-300 hover:opacity-90"
-                onClick={() => handleViewDetails(product)} // Pass the full product object
-                loading="lazy" // Lazy load images
+                onClick={() => handleViewDetails(product)}
+                loading="lazy"
             />
         </div>
 
@@ -119,7 +119,7 @@ const ProductCard = React.memo(({ product, handleAddToCart, handleViewDetails, a
                     {addedToCart[product.id] ? 'Added ✅' : 'Add to Cart'}
                 </button>
                 <button
-                    onClick={() => handleViewDetails(product)} // Pass the full product object
+                    onClick={() => handleViewDetails(product)}
                     className="flex-1 py-3 bg-gray-800/80 hover:bg-gray-700/80 rounded-lg transition-colors duration-200 font-semibold text-lg text-yellow-300 border border-yellow-600/60 hover:border-yellow-500"
                 >
                     Details
@@ -129,15 +129,40 @@ const ProductCard = React.memo(({ product, handleAddToCart, handleViewDetails, a
     </motion.div>
 ));
 
-// Add displayName to the ProductCard component
 ProductCard.displayName = 'ProductCard';
 
 // Main ProductGrid Component
 const ProductGrid = () => {
     const router = useRouter();
     const [addedToCart, setAddedToCart] = useState({});
+    const [products, setProducts] = useState(productsData); // استخدام البيانات الثابتة كقيمة افتراضية
 
-    // Handle Add to Cart with Toggle Functionality
+    // جلب البيانات من JSONPlaceholder API
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const response = await fetch('https://jsonplaceholder.typicode.com/posts');
+                const data = await response.json();
+
+                // دمج البيانات الثابتة مع البيانات من API
+                const mergedProducts = productsData.map((product, index) => ({
+                    ...product,
+                    title: data[index]?.title || product.name, // استخدام عنوان من API إذا كان متاحًا
+                    body: data[index]?.body || product.description, // استخدام الوصف من API إذا كان متاحًا
+                }));
+
+                setProducts(mergedProducts);
+            } catch (error) {
+                console.error('Error fetching products:', error);
+                // في حالة حدوث خطأ، نستخدم البيانات الثابتة فقط
+                setProducts(productsData);
+            }
+        };
+
+        fetchProducts();
+    }, []);
+
+    // Handle Add to Cart
     const handleAddToCart = useCallback((product) => {
         setAddedToCart(prev => ({ ...prev, [product.id]: !prev[product.id] }));
         toast.success(
@@ -155,12 +180,12 @@ const ProductGrid = () => {
         );
     }, [addedToCart]);
 
-    // Handle View Details Navigation
+    // Handle View Details
     const handleViewDetails = (product) => {
-        router.push(`/products/${encodeURIComponent(product.name)}`); // Use encodeURIComponent for safe URLs
+        router.push(`/products/${encodeURIComponent(product.id)}`);
     };
 
-    // Handle Go Home Navigation
+    // Handle Go Home
     const handleGoHome = () => {
         router.push('/');
     };
@@ -187,7 +212,7 @@ const ProductGrid = () => {
 
             {/* Product Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 pt-16">
-                {productsData.map((product) => (
+                {products.map((product) => (
                     <ProductCard
                         key={product.id}
                         product={product}
