@@ -50,17 +50,20 @@ export default function MobileMenu({ open, onClose, navLinks, searchQuery, onSea
           sx={{
             display: 'flex',
             alignItems: 'center',
-            bgcolor: 'rgba(255,255,255,0.1)',
+            bgcolor: 'rgba(0,0,0,0.3)', // Darker background for better contrast
             borderRadius: 1,
             px: 2,
-            py: 1,
+            py: 1.5, // Increased padding for touch
             mb: 3,
-            border: '1px solid rgba(255,255,255,0.2)', // Added default border
-            transition: 'border-color 0.3s',
+            minHeight: 48, // Ensures sufficient tap area
+            border: '1px solid rgba(255,255,255,0.2)',
+            transition: 'border-color 0.3s, background-color 0.3s',
             '&:focus-within': {
               borderColor: alpha('#ffd700', 0.5),
+              bgcolor: 'rgba(0,0,0,0.4)', // Feedback when focused
             },
           }}
+          onClick={(e) => e.stopPropagation()} // Prevents drawer from closing on tap
         >
           <Search sx={{ mr: 1, color: 'rgba(255,255,255,0.7)' }} />
           <InputBase
@@ -68,18 +71,19 @@ export default function MobileMenu({ open, onClose, navLinks, searchQuery, onSea
             value={searchQuery}
             onChange={handleSearchChange}
             fullWidth
-            type="search" // Optimized for mobile keyboards
+            type="search"
             sx={{
               color: 'white',
-              '& .MuiInputBase-input::placeholder': { // Styled placeholder
+              '& .MuiInputBase-input::placeholder': {
                 color: 'rgba(255,255,255,0.5)',
                 opacity: 1,
               },
             }}
             inputProps={{
               'aria-label': 'Search products',
-              autoCapitalize: 'none', // No auto-capitalization
-              autoCorrect: 'off',     // No auto-correction
+              autoCapitalize: 'none',
+              autoCorrect: 'off',
+              readOnly: false, // Explicitly editable
             }}
           />
           {searchQuery && (
