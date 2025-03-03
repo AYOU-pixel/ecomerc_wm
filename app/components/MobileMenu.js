@@ -40,8 +40,8 @@ export default function MobileMenu({ open, onClose, navLinks, searchQuery, onSea
         {/* Header */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography variant="h6">Menu</Typography>
-          <IconButton onClick={onClose} sx={{ color: 'white' }}>
-            <Close />
+          <IconButton onClick={onClose} sx={{ color: 'white' }} size="medium">
+            <Close fontSize="medium" />
           </IconButton>
         </Box>
 
@@ -55,7 +55,7 @@ export default function MobileMenu({ open, onClose, navLinks, searchQuery, onSea
             px: 2,
             py: 1,
             mb: 3,
-            border: '1px solid transparent',
+            border: '1px solid rgba(255,255,255,0.2)', // Added default border
             transition: 'border-color 0.3s',
             '&:focus-within': {
               borderColor: alpha('#ffd700', 0.5),
@@ -68,12 +68,23 @@ export default function MobileMenu({ open, onClose, navLinks, searchQuery, onSea
             value={searchQuery}
             onChange={handleSearchChange}
             fullWidth
-            sx={{ color: 'white' }}
-            inputProps={{ 'aria-label': 'Search products' }}
+            type="search" // Optimized for mobile keyboards
+            sx={{
+              color: 'white',
+              '& .MuiInputBase-input::placeholder': { // Styled placeholder
+                color: 'rgba(255,255,255,0.5)',
+                opacity: 1,
+              },
+            }}
+            inputProps={{
+              'aria-label': 'Search products',
+              autoCapitalize: 'none', // No auto-capitalization
+              autoCorrect: 'off',     // No auto-correction
+            }}
           />
           {searchQuery && (
-            <IconButton onClick={clearSearch} size="small" sx={{ color: 'rgba(255,255,255,0.7)', ml: 1 }}>
-              <Close fontSize="small" />
+            <IconButton onClick={clearSearch} size="medium" sx={{ color: 'rgba(255,255,255,0.7)', ml: 1 }}>
+              <Close fontSize="medium" />
             </IconButton>
           )}
         </Box>
